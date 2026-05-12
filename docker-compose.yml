@@ -1,0 +1,51 @@
+services:
+  mira-service:
+    build: .
+    container_name: rivas-mira-service
+    restart: unless-stopped
+    command: ["mira-telegram-service-api"]
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8090/ready').getcode()==200 else 1)",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 4
+      start_period: 20s
+
+  rivas-bot:
+    build: .
+    container_name: rivas-bale-bot
+    restart: unless-stopped
+    command: ["rivas-bot"]
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8088:8080"
+    depends_on:
+      mira-service:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/ready').getcode()==200 else 1)",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
