@@ -7,9 +7,15 @@ __pycache__/
 .mypy_cache/
 .venv/
 .env
+.env.test
 *.session
 *.sqlite3
 *.db
 /data/
 
 *.egg-info/
+.coverage
+htmlcov/
+.DS_Store
+.idea/
+.vscode/
