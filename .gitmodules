@@ -1,0 +1,3 @@
+[submodule "submodules/mira-telegram-service"]
+	path = submodules/mira-telegram-service
+	url = ../mira-telegram-service
