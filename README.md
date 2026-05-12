@@ -107,6 +107,12 @@ git submodule update --init --recursive
 cp .env.example .env
 ```
 
+برای تست محلی یا CI:
+
+```bash
+cp .env.test.example .env.test
+```
+
 مقادیر ضروری:
 - `BALE_BOT_TOKEN`
 - `TG_API_ID`
