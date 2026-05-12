@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rivas"
+version = "0.1.0"
+description = "Rivas (ریواس) - Bale bot bridge to Telegram Mira via Telethon"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "Rivas Team" }
+]
+dependencies = [
+  "python-bale-bot>=2.5.0,<3.0.0",
+  "aiosqlite>=0.20.0,<1.0.0",
+  "aiohttp>=3.9.0,<4.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2.0,<9.0.0",
+  "pytest-asyncio>=0.23.0,<1.0.0"
+]
+
+[project.scripts]
+rivas = "rivas.main:main"
+rivas-bot = "rivas.main:main"
+rivas-mira-api = "rivas.mira_service.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
