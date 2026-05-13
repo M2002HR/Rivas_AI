@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from rivas.config import DatabaseConfig
 from rivas.models import InputType, MiraResponse, RequestPayload
 from rivas.storage import Storage
 
@@ -11,7 +12,19 @@ from rivas.storage import Storage
 @pytest.mark.asyncio
 async def test_storage_request_lifecycle(tmp_path: Path):
     db_path = tmp_path / "rivas_test.db"
-    storage = Storage(db_path, retention_days=7)
+    storage = Storage(
+        DatabaseConfig(
+            backend="sqlite",
+            db_url=f"sqlite:///{db_path}",
+            sqlite_path=db_path,
+            mysql_host=None,
+            mysql_port=None,
+            mysql_user=None,
+            mysql_password=None,
+            mysql_database=None,
+        ),
+        retention_days=7,
+    )
     await storage.init()
 
     payload = RequestPayload(
@@ -39,7 +52,19 @@ async def test_storage_request_lifecycle(tmp_path: Path):
 @pytest.mark.asyncio
 async def test_storage_user_settings(tmp_path: Path):
     db_path = tmp_path / "rivas_settings.db"
-    storage = Storage(db_path, retention_days=7)
+    storage = Storage(
+        DatabaseConfig(
+            backend="sqlite",
+            db_url=f"sqlite:///{db_path}",
+            sqlite_path=db_path,
+            mysql_host=None,
+            mysql_port=None,
+            mysql_user=None,
+            mysql_password=None,
+            mysql_database=None,
+        ),
+        retention_days=7,
+    )
     await storage.init()
 
     before = await storage.get_user_settings("u10")
