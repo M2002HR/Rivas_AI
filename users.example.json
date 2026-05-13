@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "users": [
+    {
+      "tenant_id": "tenant_demo001",
+      "tenant_slug": "demo001",
+      "owner_name": "Demo User",
+      "status": "active",
+      "bale_user_id": "123456789",
+      "bale_chat_id": "123456789",
+      "phone_e164": "+989000000000",
+      "telegram": {
+        "api_id": 12345678,
+        "api_hash": "replace_with_real_hash",
+        "string_session": ""
+      }
+    }
+  ]
+}
