@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 .env
 .env.test
+users.json
 *.session
 *.sqlite3
 *.db

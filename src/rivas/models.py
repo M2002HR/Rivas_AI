@@ -19,12 +19,21 @@ class RequestStatus(str, Enum):
     FAILED = "failed"
 
 
+class RegistrationStatus(str, Enum):
+    AWAITING_USERNAME = "awaiting_username"
+    AWAITING_PHONE = "awaiting_phone"
+    PENDING_ADMIN = "pending_admin"
+    PROVISIONED = "provisioned"
+    CANCELLED = "cancelled"
+
+
 @dataclass(slots=True)
 class RequestPayload:
     request_id: str
     bale_user_id: str
     bale_chat_id: str
     input_type: InputType
+    tenant_id: str = ""
     text: str | None = None
     caption: str | None = None
     media_bytes: bytes | None = None
@@ -69,3 +78,25 @@ class MiraResponse:
             ],
             "source_message_ids": self.source_message_ids,
         }
+
+
+@dataclass(slots=True)
+class TenantBinding:
+    tenant_id: str
+    tenant_slug: str
+    bale_user_id: str
+    bale_chat_id: str
+    tenant_status: str
+    endpoint_base_url: str
+    runtime_status: str
+
+
+@dataclass(slots=True)
+class RegistrationRequest:
+    bale_user_id: str
+    bale_chat_id: str
+    status: RegistrationStatus
+    desired_username: str | None = None
+    phone_e164: str | None = None
+    note: str | None = None
+    tenant_id: str | None = None

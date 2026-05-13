@@ -17,6 +17,7 @@ def _config() -> MiraServiceConfig:
         quiet_window_seconds=4,
         first_response_timeout_seconds=45,
         overall_timeout_seconds=150,
+        relay_hard_timeout_seconds=210,
         floodwait_hard_limit_seconds=120,
         api_host="127.0.0.1",
         api_port=8090,
