@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import sys
 
 from .app import RivasApp
@@ -18,8 +19,18 @@ def main() -> None:
     log = get_logger("rivas.main")
     log.info("Starting Rivas bot in %s", config.app_env)
 
-    app = RivasApp(config)
-    app.run()
+    retry_seconds = 3
+    while True:
+        try:
+            app = RivasApp(config)
+            app.run()
+            return
+        except KeyboardInterrupt:
+            return
+        except Exception as exc:
+            log.exception("bot_runtime_crashed | retry_in_seconds=%s | error=%s", retry_seconds, exc)
+            time.sleep(retry_seconds)
+            retry_seconds = min(30, retry_seconds * 2)
 
 
 if __name__ == "__main__":
