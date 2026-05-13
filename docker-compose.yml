@@ -1,15 +1,73 @@
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: rivas-mysql
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      AUTOHEAL_CONTAINER_LABEL: all
+    labels:
+      autoheal: "true"
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: rivas-phpmyadmin
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    labels:
+      autoheal: "true"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${PMA_PORT:-8089}:80"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(extension_loaded('mysqli') ? 0 : 1);"]
+      interval: 30s
+      timeout: 5s
+      retries: 4
+      start_period: 20s
+
   mira-service:
     build: .
     container_name: rivas-mira-service
     restart: unless-stopped
+    profiles: ["standalone"]
     command: ["mira-telegram-service-api"]
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/app/data
     ports:
       - "8090:8090"
+    labels:
+      autoheal: "true"
+    depends_on:
+      mysql:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -30,12 +88,25 @@ services:
     command: ["rivas-bot"]
     env_file:
       - .env
+    environment:
+      HTTP_PROXY: ${BALE_HTTP_PROXY_URL:-}
+      HTTPS_PROXY: ${BALE_HTTP_PROXY_URL:-}
+      http_proxy: ${BALE_HTTP_PROXY_URL:-}
+      https_proxy: ${BALE_HTTP_PROXY_URL:-}
+      NO_PROXY: ${BALE_NO_PROXY:-localhost,127.0.0.1,mysql,rivas-mysql,tenant-fandogh-mira,tenant-mhr-9100973410-mira,tenant-smoke02-mira}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     volumes:
       - ./data:/app/data
     ports:
       - "8088:8080"
+    labels:
+      autoheal: "true"
     depends_on:
-      mira-service:
+      mysql:
         condition: service_healthy
     healthcheck:
       test:
@@ -49,3 +120,18 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
+
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: rivas-autoheal
+    restart: unless-stopped
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: all
+      AUTOHEAL_INTERVAL: ${AUTOHEAL_INTERVAL:-15}
+      CURL_TIMEOUT: ${AUTOHEAL_CURL_TIMEOUT:-10}
+      START_PERIOD: ${AUTOHEAL_START_PERIOD:-30}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  mysql_data:

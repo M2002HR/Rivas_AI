@@ -13,8 +13,12 @@ authors = [
 ]
 dependencies = [
   "python-bale-bot>=2.5.0,<3.0.0",
+  "Telethon>=1.43.0,<1.44.0",
+  "python-socks[asyncio]>=2.4.4,<3.0.0",
+  "aiomysql>=0.2.0,<1.0.0",
   "aiosqlite>=0.20.0,<1.0.0",
-  "aiohttp>=3.9.0,<4.0.0"
+  "aiohttp>=3.9.0,<4.0.0",
+  "cryptography>=43.0.0,<46.0.0"
 ]
 
 [project.optional-dependencies]
@@ -27,6 +31,10 @@ dev = [
 rivas = "rivas.main:main"
 rivas-bot = "rivas.main:main"
 rivas-mira-api = "rivas.mira_service.main:main"
+rivas-admin = "rivas.admin:main"
+rivas-load-users = "rivas.load_users:main"
+rivas-registration-admin = "rivas.registration_admin:main"
+rivas-runtime-reconcile = "rivas.runtime_reconcile:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
